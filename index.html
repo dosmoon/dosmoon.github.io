@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>dosmoon</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+    background: radial-gradient(ellipse at top, #1a1a2e 0%, #0f0f1e 50%, #050510 100%);
+    color: #e8e8f0;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .container {
+    text-align: center;
+    padding: 2rem;
+    position: relative;
+    z-index: 1;
+  }
+  .logo {
+    font-size: clamp(3rem, 10vw, 6rem);
+    font-weight: 200;
+    letter-spacing: 0.2em;
+    background: linear-gradient(135deg, #a8b5ff 0%, #c8a8ff 50%, #ffa8d8 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1rem;
+    animation: fadeIn 1.2s ease-out;
+  }
+  .tagline {
+    font-size: clamp(0.9rem, 2vw, 1.1rem);
+    color: #8a8aa8;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    margin-bottom: 3rem;
+    animation: fadeIn 1.2s ease-out 0.3s backwards;
+  }
+  .status {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1.25rem;
+    border: 1px solid rgba(168, 181, 255, 0.2);
+    border-radius: 999px;
+    font-size: 0.85rem;
+    color: #a8b5ff;
+    animation: fadeIn 1.2s ease-out 0.6s backwards;
+  }
+  .dot {
+    width: 6px;
+    height: 6px;
+    background: #a8b5ff;
+    border-radius: 50%;
+    animation: pulse 2s ease-in-out infinite;
+  }
+  .moon {
+    position: absolute;
+    top: 15%;
+    right: 15%;
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #2a2a4e, #15152e);
+    box-shadow: 0 0 80px rgba(168, 181, 255, 0.15), inset -20px -20px 50px rgba(0,0,0,0.5);
+    opacity: 0.6;
+    animation: float 8s ease-in-out infinite;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(1.3); }
+  }
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+  }
+  footer {
+    position: fixed;
+    bottom: 1.5rem;
+    left: 0;
+    right: 0;
+    text-align: center;
+    font-size: 0.8rem;
+    color: #4a4a68;
+  }
+  footer a { color: #6a6a98; text-decoration: none; }
+  footer a:hover { color: #a8b5ff; }
+</style>
+</head>
+<body>
+  <div class="moon"></div>
+  <div class="container">
+    <h1 class="logo">dosmoon</h1>
+    <p class="tagline">Coming Soon</p>
+    <div class="status">
+      <span class="dot"></span>
+      <span>Site under construction</span>
+    </div>
+  </div>
+  <footer>
+    &copy; 2026 dosmoon &middot; <a href="https://github.com/dosmoon">GitHub</a>
+  </footer>
+</body>
+</html>
