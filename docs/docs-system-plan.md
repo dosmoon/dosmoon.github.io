@@ -21,9 +21,10 @@ dosmoon/                                  GitHub 组织
 
 ## 技术栈
 
-- **框架**:Astro 5 + Starlight
-- **包管理**:pnpm
+- **框架**:Astro 6 + Starlight 0.39+
+- **包管理**:pnpm 9(**不用 10**,见"已知陷阱"章节)
 - **部署**:GitHub Actions(`withastro/action@v6`)
+- **Node**:22
 - **域名**:`dosmoon.com`(已绑定到 `dosmoon.github.io`,DNS 在 Cloudflare)
 
 ## 一、`.github` 仓库
@@ -128,7 +129,7 @@ jobs:
       - uses: withastro/action@v6
         with:
           node-version: 22
-          package-manager: pnpm@latest
+          package-manager: pnpm@9    # 钉 v9,详见"已知陷阱"
 
   deploy:
     needs: build
@@ -236,7 +237,7 @@ jobs:
         with:
           path: ./site
           node-version: 22
-          package-manager: pnpm@latest
+          package-manager: pnpm@9    # 钉 v9,详见"已知陷阱"
 
   deploy:
     needs: build
@@ -303,12 +304,81 @@ DNS 在 Cloudflare,需保持以下设置:
 
 ## 实施顺序
 
-1. ✅ **域名绑定**(已完成):`dosmoon.com` → `dosmoon.github.io`,HTTPS 生效
-2. **创建 `.github` 仓库**:加 `profile/README.md`,组织主页生效
-3. **改造 `dosmoon.github.io`**:用 Astro + Starlight 替换当前临时 landing page,部署上线
-4. **配置组织 Settings**:URL、Pinned repos
+1. ✅ **域名绑定**:`dosmoon.com` → `dosmoon.github.io`,HTTPS 生效
+2. ✅ **创建 `.github` 仓库**:`profile/README.md` 双语(英文默认 + `README.zh-CN.md`),组织主页生效
+3. ✅ **改造 `dosmoon.github.io`**:Astro 6 + Starlight 0.39 替换临时 landing page,双语部署上线
+4. **配置组织 Settings**:URL、Pinned repos(浏览器 UI 操作)
 5. **试点一个项目**:加 `docs/public/` + `docs/private/` + `site/` + `sync-docs.mjs` + `deploy-site.yml`,验证 `https://dosmoon.com/<REPO>/` 正常
 6. **推广到其他项目**:复制试点结构
+
+## 已知陷阱与 CI 配置经验
+
+下面三条都是 `dosmoon.github.io` 门户站首次部署时踩过的真坑,验证有效后写进规范。给项目仓搭 `site/` 时,直接照本节的结论配,不要自行尝试"更新版本/更激进默认值"。
+
+### 1. `packageManager` 字段与 workflow `package-manager` 输入二选一
+
+**症状**:CI 报 `Multiple versions of pnpm specified ... ERR_PNPM_BAD_PM_VERSION`。
+
+**原因**:`pnpm/action-setup`(被 `withastro/action@v6` 内部调用)读到了两个不一致的 pnpm 版本来源——`package.json` 里的 `"packageManager": "pnpm@x.y.z"` 与 workflow 的 `package-manager: pnpm@xxx`。
+
+**结论**:
+- 项目 `package.json` **不要写 `packageManager` 字段**
+- workflow 里固定写 `package-manager: pnpm@9`
+- 单一来源:workflow 是 CI pnpm 版本的唯一权威
+- 本地开发用什么 pnpm 都行(corepack/全局安装/包管理器都可以)
+
+### 2. CI 必须钉 pnpm@9,不要用 pnpm@10 或 pnpm@latest
+
+**症状**:CI 报 `[ERR_PNPM_IGNORED_BUILDS] Ignored build scripts: esbuild@..., sharp@...`。
+
+**原因**:pnpm 10 默认拒绝执行 dependency 的 postinstall 脚本(供应链安全考虑)。`esbuild` 和 `sharp` 都依赖原生二进制的 install hook,被拒绝后 build 直接失败。pnpm 10 的官方解法是在 `package.json` 加 `pnpm.onlyBuiltDependencies: ["esbuild", "sharp"]` 白名单,但**实测在 `withastro/action@v6` 调起的环境里这个字段不生效**(原因尚未深究)。
+
+**结论**:
+- workflow 写 `package-manager: pnpm@9`,绕开整个 strict 模式
+- 不要写 `pnpm@latest`(latest 现在 = pnpm 10,且会持续漂移)
+- 等 pnpm 10 在 `withastro/action` 里的支持稳定再考虑升级
+
+### 3. Starlight 0.39+ 的 `social` 是数组,旧版是对象;且强制 Astro 6
+
+**症状**:Astro 5 + Starlight 0.32 + 数组 `social` 配置 → `Expected type "object", received "array"`;升级到 Starlight 0.39 但 Astro 还是 5 → `astro/zod does not provide an export named 'locales'`。
+
+**原因**:Starlight `social` 字段在 0.39 版本从对象语法切到了数组语法,且 0.39 把 peer dep 升到 `astro@^6.0.0`。
+
+**结论**(给项目仓 `site/` 用):
+```json
+// package.json
+{
+  "dependencies": {
+    "@astrojs/starlight": "^0.39.0",
+    "astro": "^6.0.0",
+    "sharp": "^0.33.5"
+  }
+}
+```
+```js
+// astro.config.mjs
+starlight({
+  social: [
+    { icon: 'github', label: 'GitHub', href: 'https://github.com/dosmoon/<REPO>' },
+  ],
+})
+```
+不要照抄 Starlight 旧文档里的 `social: { github: '...' }` 写法。
+
+### 4. `public/CNAME` 不要省
+
+**结论**:每个用 GitHub Actions 部署到 Pages + 自定义域名的仓库,`public/CNAME` 文件都必须存在,内容是 `dosmoon.com`(单行)。Astro 会把它复制到 `dist/`,Pages 用它确认自定义域名归属。省掉这一步,自定义域名设置可能在某次重新部署后丢失。
+
+### 5. Pages Source 切到 GitHub Actions 是手动 UI 步骤,且必须**先切再 push**
+
+**症状**:如果保持 `Deploy from a branch` 模式直接 push Astro 源码,Pages 会把 `package.json`、`src/` 当成静态文件发布,网站立刻坏掉。
+
+**结论**:
+1. 先在浏览器里 Settings → Pages → Source 改为 **GitHub Actions**
+2. 再 push 代码
+3. 等 workflow 跑完 artifact 上传,Pages 自动接管
+
+新建项目仓时,这一步绝不能颠倒。门户已经踩过、不会再踩,但项目仓试点时仍要遵守此顺序。
 
 ## 不变约束
 
