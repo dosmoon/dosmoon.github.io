@@ -258,6 +258,109 @@ jobs:
 - **Website** 填 `https://dosmoon.com/<REPO>/`
 - ☑️ 勾选 **Use your GitHub Pages website**
 
+### 内容编写指南(项目仓的 Claude Code 看这一节就够)
+
+> 本节是面向**任何要往项目仓 `docs/public/` 里加内容的人**(包括 aistack 自己仓里的 Claude Code session)的操作手册。规范层面的"为什么这么设计"已经在前面章节讲过,本节只讲怎么用。
+
+#### 发布机制(必须先理解的一条)
+
+`docs/public/` 是**唯一的发布源**。任何想出现在 `https://dosmoon.com/<REPO>/` 的内容,必须放在这里。`docs/public/` 之外的所有路径(包括项目仓里现存的 `docs/api/`、`docs/design/`、`docs/research-note/` 等)**不会被发布**,但跟随仓库提交,GitHub 网页可读。
+
+要把现有内容发出去:`git mv docs/api docs/public/api`,git 会识别为重命名,blame 历史保留。一次搬一个目录或一个文件,每次 commit 单独评审,避免一锅端把不该公开的内容也带进去。
+
+#### 文件结构与 URL 映射
+
+```
+docs/public/index.md              → /<REPO>/
+docs/public/configuration.md      → /<REPO>/configuration/
+docs/public/api/index.md          → /<REPO>/api/
+docs/public/api/asr.md            → /<REPO>/api/asr/
+```
+
+文件路径 = URL 路径(去掉 `.md`)。`index.md` 渲染为目录首页。
+
+#### Frontmatter 模板
+
+每个 `.md` 文件顶部必须有 frontmatter:
+
+```yaml
+---
+title: 页面标题
+description: 一句话描述,出现在 sidebar tooltip、搜索摘要、HTML <meta> 中
+---
+```
+
+只要 `title` 在 sidebar 显示;`description` 不显示但对 SEO 关键。可选字段(按需加):
+
+```yaml
+---
+title: ...
+description: ...
+sidebar:
+  order: 1                    # 控制在 sidebar 中的排序
+  badge: { text: New }        # 标题旁加一个徽章
+draft: true                   # 临时下线已发布的页(不出现在生产构建)
+---
+```
+
+#### 双语放置规则
+
+- **英文版**直接放在 `docs/public/` 根下:`docs/public/api/asr.md`
+- **中文版**整体放在 `docs/public/zh-cn/` 下,**镜像同样的目录结构和文件名**:`docs/public/zh-cn/api/asr.md`
+- **文件名保持英文**(包括中文版),Starlight 靠文件名配对中英版本来驱动语言切换器
+- 翻译的是 frontmatter 的 `title`/`description` 和正文,文件名永远不动
+- 中文版可以漏译某些页,Starlight 会自动 fallback 到英文版,并在页顶显示"此内容尚不支持你的语言"提示
+
+**对应关系示例**:
+
+| 英文路径 | 中文路径 | URL(英文) | URL(中文) |
+|---|---|---|---|
+| `docs/public/api/asr.md` | `docs/public/zh-cn/api/asr.md` | `/<REPO>/api/asr/` | `/<REPO>/zh-cn/api/asr/` |
+
+**❌ 不要这样写**:`docs/public/api/zh-cn/asr.md`(语言前缀必须是 `docs/public/` 的最外层目录,不能嵌进子模块里)
+
+#### 草稿与下线
+
+- **写到一半 commit**:文件名前加 `_`,如 `_wip-new-feature.md`。`sync-docs.mjs` 会跳过 `_` 开头的文件,Astro/Starlight 默认也忽略它们。改完去掉前缀就发出去
+- **临时下线已发布页**:在 frontmatter 加 `draft: true`,Astro 会跳过它。比 mv 进 `docs/private/` 更轻量,但要记得删
+
+#### 本地开发
+
+```sh
+cd site
+npx pnpm@9 install
+npx pnpm@9 dev      # http://localhost:4321/<REPO>/
+```
+
+构建本地预览(模拟生产):
+
+```sh
+npx pnpm@9 build
+npx pnpm@9 preview
+```
+
+注意:
+- 本地必须用 **pnpm 9**(原因见"已知陷阱"第 2 条)。直接安装的 pnpm 通常是 v10,会报 `ERR_PNPM_IGNORED_BUILDS`。`npx pnpm@9` 是最方便的解
+- `dev`/`build` 通过 `prebuild` hook 自动跑 `sync-docs.mjs`,把 `docs/public/` 复制到 `site/src/content/docs/`
+- **不要直接编辑 `site/src/content/docs/`**:它是构建产物,gitignored,每次构建都会被 `sync-docs.mjs` 覆盖。要改内容只改 `docs/public/` 下的源文件
+- 文档站每页右上角有"Edit on GitHub"链接,点了直接跳到 `github.com/<ORG>/<REPO>/edit/main/docs/public/<file>`
+
+#### 部署触发
+
+- push 到 `main` 时,只在改了 `docs/public/**`、`site/**`、`.github/workflows/deploy-site.yml` 时才触发部署 workflow
+- 改项目仓的源码(如 aistack 的 `aistack/` Python 包)**不会**触发文档站重新部署
+- 想强制重跑:GitHub Actions 页面 → 选 `Deploy Site` workflow → 点 **Run workflow**(workflow_dispatch 已配置)
+
+#### 排查清单
+
+文档没出现在站上时按顺序检查:
+
+1. 文件是否在 `docs/public/` 下?(不在 → 不会发布)
+2. 文件名是否以 `_` 开头?(是 → 被 sync 脚本跳过)
+3. frontmatter 是否有 `draft: true`?(有 → 被 Astro 跳过)
+4. 最近一次 push 是否触发了 `Deploy Site` workflow?(`gh run list --repo <ORG>/<REPO> --workflow=deploy-site.yml`)
+5. workflow 是否成功?失败的话看日志
+
 ## 四、自定义域名(已完成,记录为参考)
 
 `dosmoon.com` 已绑定到 `dosmoon.github.io`,所有项目仓库的 Pages 自动跟上,使用同一个根域名:
