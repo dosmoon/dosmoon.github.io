@@ -1,0 +1,33 @@
+---
+title: dosmoon
+description: 探索 AI Coding 的无限可能。
+template: splash
+hero:
+  tagline: 探索 AI Coding 的无限可能。
+  actions:
+    - text: 浏览项目
+      link: /zh-cn/projects/
+      icon: right-arrow
+      variant: primary
+    - text: GitHub
+      link: https://github.com/dosmoon
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## 我们在做什么
+
+<CardGrid>
+  <Card title="VideoCraft" icon="seti:video">
+    一体化视频处理工具 —— yt-dlp 下载、Whisper 转写、字幕翻译与合并、多码率转码,一条流水线通到底。
+
+    [github.com/dosmoon/VideoCraft →](https://github.com/dosmoon/VideoCraft)
+  </Card>
+  <Card title="aistack" icon="setting">
+    本地化 ASR / TTS 服务,OpenAI API 兼容 —— 为上层工具填补 Ollama 之外的语音能力空白。
+
+    [github.com/dosmoon/aistack →](https://github.com/dosmoon/aistack)
+  </Card>
+</CardGrid>

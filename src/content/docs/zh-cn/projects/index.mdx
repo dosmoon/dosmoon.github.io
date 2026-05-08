@@ -1,0 +1,27 @@
+---
+title: 项目
+description: dosmoon 旗下的创作者工具与 AI 基础设施项目。
+---
+
+dosmoon 同时投入创作者工具与本地 AI 基础设施两条线。下面每个项目都有独立的 GitHub 仓库,专属文档站会随着工程推进逐步上线。
+
+## VideoCraft
+
+一体化视频处理工具。把"下载视频 → 抓字幕 → 翻译 → 合并字幕 → 重新转码到目标平台"这条长尾自动化,不用再把五个工具拼来拼去。
+
+- **仓库:** [github.com/dosmoon/VideoCraft](https://github.com/dosmoon/VideoCraft)
+- **能力:** yt-dlp 下载 · Whisper 转写 · 多语言字幕翻译 · 字幕视频合并 · 多码率转码
+- **技术栈:** Python
+
+## aistack
+
+本地优先的 ASR(语音识别)与 TTS(语音合成)服务,对外暴露 OpenAI 兼容的 HTTP API。它的定位是 Ollama 在语音侧的对应物 —— 任何已经支持 OpenAI API 的工具,把 endpoint 指到本机就能用上本地语音。
+
+- **仓库:** [github.com/dosmoon/aistack](https://github.com/dosmoon/aistack)
+- **能力:** faster-whisper / Parakeet / SenseVoice 多 ASR 后端 · 通过 vLLM-Omni 跑 Qwen3-TTS · 每项能力的滚动 p50/p95/p99 指标 · 跨后端 WER/RTF 基准对比
+- **技术栈:** Python、vLLM、Docker
+- **定位:** 研究级。面向想对比不同后端、把本地语音整合进自家流水线的开发者,不面向期待"一键安装"的终端用户。
+
+---
+
+*更多项目会在公开后陆续在此上架。*

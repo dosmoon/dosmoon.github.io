@@ -1,0 +1,33 @@
+---
+title: dosmoon
+description: Exploring the limitless possibilities of AI coding.
+template: splash
+hero:
+  tagline: Exploring the limitless possibilities of AI coding.
+  actions:
+    - text: Explore Projects
+      link: /projects/
+      icon: right-arrow
+      variant: primary
+    - text: GitHub
+      link: https://github.com/dosmoon
+      icon: external
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## What we build
+
+<CardGrid>
+  <Card title="VideoCraft" icon="seti:video">
+    End-to-end video processing — yt-dlp downloads, Whisper transcription, subtitle translation & merging, multi-bitrate encoding.
+
+    [github.com/dosmoon/VideoCraft →](https://github.com/dosmoon/VideoCraft)
+  </Card>
+  <Card title="aistack" icon="setting">
+    Local ASR / TTS service with an OpenAI-compatible API — filling the speech-side gap that Ollama leaves on the LLM side.
+
+    [github.com/dosmoon/aistack →](https://github.com/dosmoon/aistack)
+  </Card>
+</CardGrid>

@@ -1,0 +1,27 @@
+---
+title: Projects
+description: dosmoon's projects across creator tools and AI infrastructure.
+---
+
+dosmoon ships software across creator tools and local AI infrastructure. Each project below has its own GitHub repository; dedicated documentation sites are coming online progressively.
+
+## VideoCraft
+
+End-to-end video processing tool. Designed to automate the long tail of "downloading a video, getting captions in another language, and re-encoding it for a target platform" without stitching five tools together yourself.
+
+- **Repository:** [github.com/dosmoon/VideoCraft](https://github.com/dosmoon/VideoCraft)
+- **Capabilities:** yt-dlp downloads · Whisper transcription · multi-language subtitle translation · subtitle/video merging · multi-bitrate encoding
+- **Stack:** Python
+
+## aistack
+
+Local-first ASR (speech recognition) and TTS (speech synthesis) service exposing an OpenAI-compatible HTTP API. Built to be the speech-side companion to Ollama on the LLM side — point any tool that already speaks the OpenAI API at `localhost` and get local speech.
+
+- **Repository:** [github.com/dosmoon/aistack](https://github.com/dosmoon/aistack)
+- **Capabilities:** faster-whisper / Parakeet / SenseVoice ASR backends · Qwen3-TTS via vLLM-Omni · per-capability rolling p50/p95/p99 metrics · cross-backend WER/RTF benchmarking
+- **Stack:** Python, vLLM, Docker
+- **Positioning:** Research-grade — built for developers who want to compare backends and integrate local speech into their own pipelines, not for end users expecting a one-click installer.
+
+---
+
+*More projects will land here as they go public.*
