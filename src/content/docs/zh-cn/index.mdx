@@ -9,13 +9,17 @@ hero:
       link: /zh-cn/projects/
       icon: right-arrow
       variant: primary
+    - text: 行业动态
+      link: /zh-cn/news/
+      icon: open-book
+      variant: secondary
     - text: GitHub
       link: https://github.com/dosmoon
       icon: external
       variant: minimal
 ---
 
-import { Card, CardGrid } from '@astrojs/starlight/components';
+import { Card, CardGrid, LinkCard } from '@astrojs/starlight/components';
 
 ## 我们在做什么
 
@@ -31,3 +35,25 @@ import { Card, CardGrid } from '@astrojs/starlight/components';
     [文档 →](/aistack/zh-cn/) · [GitHub →](https://github.com/dosmoon/aistack)
   </Card>
 </CardGrid>
+
+## 最新文章
+
+<CardGrid>
+  <LinkCard
+    title="电力撞墙与轨道算力:AI 基础设施的下一个跃迁"
+    description="AI 基础设施撞上地球物理极限——电、水、土地。为何轨道算力可能是下一个跃迁,以及它如何绕过 SBSP 最难的那一步。"
+    href="/zh-cn/news/power-wall-and-orbital-compute/"
+  />
+  <LinkCard
+    title="Token Processor 与 3D 打印:重构工业技术栈"
+    description="当 AI 秒级生成代码、3D 打印按需制造,工业的数字端和物理端被同时改写——新的工业技术栈正在成型。"
+    href="/zh-cn/news/token-processor-and-3d-printing/"
+  />
+  <LinkCard
+    title="Token Processor 调查报告"
+    description="围绕 Token 原语的专用智能加速器产业调查——产品形态、架构路径、玩家、风险与时间线。"
+    href="/zh-cn/news/token-processor-investigation-report/"
+  />
+</CardGrid>
+
+[查看全部文章 →](/zh-cn/news/)
