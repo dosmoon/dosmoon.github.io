@@ -18,6 +18,7 @@ src/content/docs/         English content (root locale)
 src/content/docs/zh-cn/   Chinese content
 public/                   Static assets (CNAME, favicons, …)
 docs/                     Internal planning notes — not published
+drafts/                   Article inbox (zh-cn/, en/) — see drafts/README.md
 ```
 
 ## Deployment
