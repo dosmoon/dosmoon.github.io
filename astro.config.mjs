@@ -20,6 +20,11 @@ export default defineConfig({
           translations: { 'zh-CN': '项目' },
           link: '/projects/',
         },
+        {
+          label: 'News',
+          translations: { 'zh-CN': '行业动态' },
+          items: [{ autogenerate: { directory: 'news' } }],
+        },
       ],
     }),
   ],

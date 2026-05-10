@@ -472,7 +472,27 @@ starlight({
 
 **结论**:每个用 GitHub Actions 部署到 Pages + 自定义域名的仓库,`public/CNAME` 文件都必须存在,内容是 `dosmoon.com`(单行)。Astro 会把它复制到 `dist/`,Pages 用它确认自定义域名归属。省掉这一步,自定义域名设置可能在某次重新部署后丢失。
 
-### 5. Pages Source 切到 GitHub Actions 是手动 UI 步骤,且必须**先切再 push**
+### 5. Starlight 0.39 的 sidebar `autogenerate` 必须套在 `items` 里
+
+**症状**:`astro build` 报 `Invalid config passed to starlight integration ... sidebar.N: Did not match union. Expected type "{ link } | { items } | { slug } | string"`。
+
+**原因**:Starlight 0.39 起,顶层 sidebar 项不再支持 `{ label, autogenerate }` 直写。带 `label` 的 group 必须用 `items` 数组承载内容,`autogenerate` 作为 `items` 中的一个条目出现。
+
+**结论**:
+```js
+// ❌ 旧写法(0.39 以下),0.39 起会报错
+{ label: 'News', autogenerate: { directory: 'news' } }
+
+// ✅ 正确写法
+{
+  label: 'News',
+  translations: { 'zh-CN': '行业动态' },
+  items: [{ autogenerate: { directory: 'news' } }],
+}
+```
+i18n 的 `translations` 字段仍然写在 group 顶层,与 `items` 并列。
+
+### 6. Pages Source 切到 GitHub Actions 是手动 UI 步骤,且必须**先切再 push**
 
 **症状**:如果保持 `Deploy from a branch` 模式直接 push Astro 源码,Pages 会把 `package.json`、`src/` 当成静态文件发布,网站立刻坏掉。
 
